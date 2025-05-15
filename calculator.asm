@@ -58,6 +58,7 @@ _start:
     syscall
     call remove_newline
 
+
     ; ask for second number
     mov rax, 1
     mov rdi, 1

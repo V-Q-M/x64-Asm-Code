@@ -58,6 +58,10 @@ _start:
     syscall
     call remove_newline
 
+    cmp byte [buffer2],'!'
+    je factorial
+
+
     ; ask for second number
     mov rax, 1
     mov rdi, 1
@@ -94,6 +98,8 @@ _start:
     je division
     ;cmp byte [buffer2], 'divide'
     je division
+    cmp byte [buffer2], '%'
+    je modulo
     cmp byte [buffer2], '^'
     je exponentiation
 
@@ -114,6 +120,12 @@ division:
     div r10
     mov r8, rax
     jmp result
+modulo:
+    mov rax, r8
+    xor rdx, rdx
+    div r10
+    mov r8, rdx
+    jmp result
 exponentiation:
     mov rax, r8
     mov r8, 1
@@ -123,6 +135,13 @@ exponentiation:
 
     imul r8, rax
     dec r10
+    jmp .loop
+factorial:
+    mov rax, r8     ; rax = n
+.loop:
+    dec rax     ; n-1
+    jz result
+    imul r8, rax    ; n * n-1
     jmp .loop
 
 
