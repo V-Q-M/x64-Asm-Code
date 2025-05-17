@@ -54,6 +54,9 @@ section .text
     global _start
 
 _start:
+
+main_loop:
+
     ; ask for first number
     print prompt1, prompt1_len
 
@@ -65,6 +68,9 @@ _start:
     mov rsi, buffer1
     call string_to_int
     mov r8, rax ; store first number in r8
+    ; check if user wants to exit
+    cmp byte [buffer1], 'q'
+    je end
 
     ; ask for operand
     print prompt2, prompt2_len
@@ -89,6 +95,8 @@ _start:
     mov r10, rax
 
     ; calculate result
+    cmp byte [buffer2], 'q'
+    je end
     cmp byte [buffer2], '+'
     je addition
     ;cmp byte [buffer2], 'plus'
@@ -158,6 +166,10 @@ output_result:
 
     ; write result
     print resultbuf, r11
+    print newline, 1
+
+; loop back
+jmp main_loop
 
 end:
     mov rax, 60
