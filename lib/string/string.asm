@@ -1,5 +1,6 @@
 global string_to_int
 global int_to_string
+global remove_newline
 
 string_to_int:
     xor rax, rax    ; clear rax
@@ -63,4 +64,24 @@ int_to_string:
     sub rdi, rsi    ; rdi - original pointer = length
     mov rax, rdi    ; return length in rax
     pop rdi         ; restore rdi
+    ret
+
+; Remove the newline character at the end of strings
+remove_newline:
+    xor rcx, rcx
+
+.remove_newline_loop:
+    mov al, [rsi + rcx]
+    cmp al, 10         ; \n
+    je .found_newline
+    cmp al, 13         ; \r
+    je .found_newline
+    test al, al
+    jz .done_removal
+    inc rcx
+    jmp .remove_newline_loop
+
+.found_newline:
+    mov byte [rsi + rcx], 0
+.done_removal:
     ret

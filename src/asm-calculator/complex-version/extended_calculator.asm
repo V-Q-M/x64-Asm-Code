@@ -1,8 +1,30 @@
 ;                   CALCULATOR APP
 ;---------------------------------------------------------
-;extern String.asm
+;String functions
 extern string_to_int
 extern int_to_string
+extern remove_newline
+
+;Math functions
+extern modulo
+extern factorial
+extern exponentiation
+
+%macro print 2
+    mov rax, 1
+    mov rdi, 1
+    mov rsi, %1
+    mov rdx, %2
+    syscall
+%endmacro
+
+%macro input 2
+    mov rax, 0
+    mov rdi, 0
+    mov rsi, %1
+    mov rdx, %2
+    syscall
+%endmacro
 
 
 section .bss
@@ -22,67 +44,45 @@ section .data
     answer_len  equ $ - answer
     newline db 10, 0 ; newline for printing
 
-    division_error db "Error: Division by Zero", 0
+    division_error db "Error: Division by Zero", 10
     division_error_len equ $ - division_error
 
     invalid_msg db "Error: Invalid Input.", 0
-    invlid_msg_len equ $ - invalid_msg
+    invalid_msg_len equ $ - invalid_msg
 
 section .text
     global _start
 
 _start:
     ; ask for first number
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, prompt1
-    mov rdx, prompt1_len
-    syscall
+    print prompt1, prompt1_len
 
-    ; read input
-    mov rax, 0
-    mov rdi, 0
-    mov rsi, buffer1
-    mov rdx, 20
-    syscall
+    ; get input
+    input buffer1, 20
     call remove_newline
+
     ; convert number1 to int
     mov rsi, buffer1
     call string_to_int
     mov r8, rax ; store first number in r8
 
     ; ask for operand
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, prompt2
-    mov rdx, prompt2_len
-    syscall
+    print prompt2, prompt2_len
 
     ; read operand
-    mov rax, 0
-    mov rdi, 0
-    mov rsi, buffer2
-    mov rdx, 20
-    syscall
+    input buffer2, 20
     call remove_newline
     ; Catch operands that dont require a second argument
     cmp byte [buffer2],'!'
-    je factorial
+    je math_factorial
 
     ; ask for second number
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, prompt3
-    mov rdx, prompt3_len
-    syscall
+    print prompt3, prompt3_len
 
     ; read second number
-    mov rax, 0
-    mov rdi, 0
-    mov rsi, buffer3
-    mov rdx, 20
-    syscall
+    input buffer3, 20
     call remove_newline
+
     ; convert number2 to int
     mov rsi, buffer3
     call string_to_int
@@ -106,17 +106,13 @@ _start:
     ;cmp byte [buffer2], 'divide'
     je division
     cmp byte [buffer2], '%'
-    je modulo
+    je math_mod
     cmp byte [buffer2], '^'
-    je exponentiation
+    je math_expt
 
 ; fallback if nothing matches
 invalidInput:
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, invalid_msg
-    mov rdx, invlid_msg_len
-    syscall
+    print invalid_msg, invalid_msg_len
     jmp end
 
 addition:
@@ -136,36 +132,19 @@ division:
     div r10
     mov r8, rax
     jmp result
-modulo:
-    mov rax, r8
-    xor rdx, rdx
-    div r10
-    mov r8, rdx
-    jmp result
-exponentiation:
-    mov rax, r8
-    mov r8, 1
-.loop:
-    cmp r10, 0
-    je result
-
-    imul r8, rax
-    dec r10
-    jmp .loop
-factorial:
-    mov rax, r8     ; rax = n
-.loop:
-    dec rax     ; n-1
-    jz result
-    imul r8, rax    ; n * n-1
-    jmp .loop
-
-
 division_by_zero:
-    mov rsi, division_error
-    mov rdx, division_error_len
-    jmp output_result
-
+    print division_error, division_error_len
+    jmp end
+; imported from math
+math_mod:
+    call modulo
+    jmp result
+math_factorial:
+    call factorial
+    jmp result
+math_expt:
+    call exponentiation
+    jmp result
 
 result:
     mov rax, r8             ; move result into rax
@@ -175,42 +154,14 @@ result:
 
 output_result:
     ; write answer preamble
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, answer
-    mov rdx, answer_len
-    syscall
+    print answer, answer_len
 
     ; write result
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, resultbuf ; correct result buffer
-    mov rdx, r11
-    syscall
-
+    print resultbuf, r11
 
 end:
     mov rax, 60
     xor rdi, rdi
     syscall
-
                         ;Helper functions
 ;-------------------------------------------------------------
-remove_newline:
-    xor rcx, rcx
-
-.remove_newline_loop:
-    mov al, [rsi + rcx]
-    cmp al, 10         ; \n
-    je .found_newline
-    cmp al, 13         ; \r
-    je .found_newline
-    test al, al
-    jz .done_removal
-    inc rcx
-    jmp .remove_newline_loop
-
-.found_newline:
-    mov byte [rsi + rcx], 0
-.done_removal:
-    ret
