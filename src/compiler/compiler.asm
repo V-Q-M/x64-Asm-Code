@@ -67,27 +67,9 @@ section .data
     ; ending
     main_footer   db "end:", 10, 9, "mov rax, 60", 10, 9, "xor rdi, rdi", 10, 9, "syscall", 10
     main_footer_len   equ $ - main_footer
-    ;----------------------------------------------------
-    ; Tokens
-    ;
-    ; KEYWORDS
-    scribe db "mov rax, 1", 10
-            db "mov rdi, 1", 10
-            db "mov rsi, teststring", 10
-            db "mov rdx, teststring_len", 10
-            db "syscall", 10
-
-    scribe_len equ $ - scribe
-
-
-    ; IDENTIFIER
-    caput db "_start:",10
-    caput_len equ $ - caput
-
-    ; NUMBER
-
-
-    ; SYMBOL
+;----------------------------------------------------
+; Tokens
+%include "tokens.asm"
 
 
 section .bss
