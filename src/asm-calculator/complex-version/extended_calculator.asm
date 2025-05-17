@@ -121,7 +121,7 @@ main_loop:
 ; fallback if nothing matches
 invalidInput:
     print invalid_msg, invalid_msg_len
-    jmp end
+    jmp main_loop
 
 addition:
     add r8, r10
