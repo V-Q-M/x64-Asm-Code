@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# Check if a file was provided
+if [ -z "$1" ]; then
+    echo "Usage: ovidc filename.ovd"
+    exit 1
+fi
+
+# Check if --asm flag is passed
+KEEP_ASM=false
+if [[ "$2" == "--asm" ]]; then
+    KEEP_ASM=true
+fi
+# Get the input filename and derive base name
+INPUT="$1"
+BASENAME=$(basename "$INPUT" .ovd)
+ASMFILE="${BASENAME}.asm"
+OBJFILE="${BASENAME}.o"
+OUTFILE="${BASENAME}"
+
+# Copy input .ovd into input.ovd (if required by compiler)
+cp "$INPUT" input.ovd
+
+# Run custom compiler to convert input.ovd -> output.asm
+./compiler || { echo "Compilation failed."; exit 1; }
+
+# Rename output.asm to the expected ASM file
+mv output.asm "$ASMFILE"
+
+# Assemble with NASM
+nasm -f elf64 "$ASMFILE" -o "$OBJFILE" || { echo "Assembly failed."; exit 1; }
+
+# Link with ld
+ld "$OBJFILE" -o "$OUTFILE" || { echo "Linking failed."; exit 1; }
+
+# Clean up
+rm -f "$OBJFILE"
+if [ "$KEEP_ASM" = false ]; then
+    rm -f "$ASMFILE"
+fi
+
+echo "Compiled successfully: $OUTFILE"
