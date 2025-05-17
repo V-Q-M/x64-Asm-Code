@@ -1,5 +1,10 @@
 ;                   CALCULATOR APP
 ;---------------------------------------------------------
+;extern String.asm
+extern string_to_int
+extern int_to_string
+
+
 section .bss
     buffer1 resb 20 ; reserve 20 Bytes for input
     buffer2 resb 20
@@ -19,6 +24,9 @@ section .data
 
     division_error db "Error: Division by Zero", 0
     division_error_len equ $ - division_error
+
+    invalid_msg db "Error: Invalid Input.", 0
+    invlid_msg_len equ $ - invalid_msg
 
 section .text
     global _start
@@ -57,7 +65,9 @@ _start:
     mov rdx, 20
     syscall
     call remove_newline
-
+    ; Catch operands that dont require a second argument
+    cmp byte [buffer2],'!'
+    je factorial
 
     ; ask for second number
     mov rax, 1
@@ -81,12 +91,33 @@ _start:
     ; calculate result
     cmp byte [buffer2], '+'
     je addition
+    ;cmp byte [buffer2], 'plus'
+    je addition
     cmp byte [buffer2], '-'
+    je subtraction
+    ;cmp byte [buffer2], 'minus'
     je subtraction
     cmp byte [buffer2], '*'
     je multiplication
+    ;cmp byte [buffer2], 'times'
+    je multiplication
     cmp byte [buffer2], '/'
     je division
+    ;cmp byte [buffer2], 'divide'
+    je division
+    cmp byte [buffer2], '%'
+    je modulo
+    cmp byte [buffer2], '^'
+    je exponentiation
+
+; fallback if nothing matches
+invalidInput:
+    mov rax, 1
+    mov rdi, 1
+    mov rsi, invalid_msg
+    mov rdx, invlid_msg_len
+    syscall
+    jmp end
 
 addition:
     add r8, r10
@@ -105,6 +136,29 @@ division:
     div r10
     mov r8, rax
     jmp result
+modulo:
+    mov rax, r8
+    xor rdx, rdx
+    div r10
+    mov r8, rdx
+    jmp result
+exponentiation:
+    mov rax, r8
+    mov r8, 1
+.loop:
+    cmp r10, 0
+    je result
+
+    imul r8, rax
+    dec r10
+    jmp .loop
+factorial:
+    mov rax, r8     ; rax = n
+.loop:
+    dec rax     ; n-1
+    jz result
+    imul r8, rax    ; n * n-1
+    jmp .loop
 
 
 division_by_zero:
@@ -159,68 +213,4 @@ remove_newline:
 .found_newline:
     mov byte [rsi + rcx], 0
 .done_removal:
-    ret
-
-
-; converts string to integer
-string_to_int:
-    xor rax, rax    ; clear rax
-    xor rcx, rcx    ; clear rcx
-.loop:
-    movzx rdx, byte [rsi + rcx] ; load byte
-    test rdx, rdx               ; null terminator?
-    jz .done                    ; if zero, done
-    cmp rdx, 10                 ; check for newline
-    je .done
-
-    sub rdx, '0'                 ; convert ASCII to int
-    imul rax, rax, 10            ; result *= 10
-    add rax, rdx                 ; result += digit
-
-    inc rcx                     ; move to next character
-    jmp .loop
-.done:
-    ret
-
-; convert integer to string
-int_to_string:
-; save original buffer pointer
-    push rdi
-    xor rcx, rcx ; digit = 0
-
-    test rax, rax
-    jnz .convert_loop
-
-    mov byte [rdi], '0'
-    mov byte [rdi + 1], 0
-    mov rax, 1
-    pop rdi
-    ret
-.convert_loop:
-    xor rdx, rdx ;clear rdx before division
-    mov rbx, 10
-    div rbx     ; rax / 10 -> quotient in rax, remainder in rdx
-
-    add rdx, '0'    ;convert digit to ascii
-    push rdx        ; store on stack (to reverse later)
-    inc rcx         ; count digits
-
-    test rax, rax
-    jnz .convert_loop
-
-.write_digits:
-    cmp rcx, 0
-    je .done
-
-    pop rax
-    mov [rdi], al
-    inc rdi
-    dec rcx
-    jmp .write_digits
-
-.done:
-    mov byte [rdi], 10
-    mov rax, rdi
-    sub rax, resultbuf
-    pop rdi
     ret
