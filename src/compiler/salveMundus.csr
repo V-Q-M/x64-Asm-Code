@@ -1,7 +1,10 @@
 Linea salve = "Salve Amici!"
 
+Linea ajena = "Hajo Ajena"
+
 
 caput
 
-
 scribe (salve)
+
+scribe (ajena)

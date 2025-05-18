@@ -11,7 +11,7 @@
 
     scribe_mid  db 10, "mov rdx, len_"
     scribe_mid_len equ $ - scribe_mid
-    text_syscall db 10, "syscall"
+    text_syscall db 10, "syscall", 10
     text_syscall_len equ $ - text_syscall
 
     linea_db    db "db "
