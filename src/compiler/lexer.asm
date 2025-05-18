@@ -45,17 +45,24 @@ match_scribe:
     add r15, 6
     add r15, 1
 
-    mov rcx, 10
+    mov r14, -1
+    small_loop:
+        inc r14
+        cmp byte [contents + r15 + r14 + 1], ')'
+        jne small_loop
+
+
+    mov rcx, r14
     lea rsi, [contents + r15 + 1] ; source = current
     lea rdi, [arg_buffer]     ; destination buffer
     rep movsb       ; copy n bytes from contents into
-    mov byte [arg_buffer + 10], 0   ; null terminate arg_buffer
+    mov byte [arg_buffer + r14], 0   ; null terminate arg_buffer
 
     ; write correct passage
     write scribe, scribe_len ; syntax
-    write arg_buffer, 10             ; argument
+    write arg_buffer, r14            ; argument
     write scribe_mid, scribe_mid_len
-    write arg_buffer, 10
+    write arg_buffer, r14
     write text_syscall, text_syscall_len
 
     jmp lexer_loop
