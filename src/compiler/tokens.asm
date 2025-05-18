@@ -3,11 +3,16 @@
 ; KEYWORDS
     scribe      db "mov rax, 1", 10
                 db "mov rdi, 1", 10
-                db "mov rsi, teststring", 10
-                db "mov rdx, teststring_len", 10
-                db "syscall", 10
+                db "mov rsi, "
+                ;db "mov rdx, len_teststring", 10
+                ;db "syscall", 10
 
     scribe_len equ $ - scribe
+
+    scribe_mid  db 10, "mov rdx, len_"
+    scribe_mid_len equ $ - scribe_mid
+    text_syscall db 10, "syscall"
+    text_syscall_len equ $ - text_syscall
 
     sisi        db "test", 0   ;si is already used
     si_len      equ $ - sisi

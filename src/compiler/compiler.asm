@@ -35,6 +35,9 @@ extern exponentiation
     syscall
 %endmacro
 
+section .bss
+    arg_buffer resb 20
+
 section .data
     input_file db "input.ovd", 0
     output_file   db "output.asm", 0
@@ -57,8 +60,8 @@ section .data
     data_header   db "section .data", 10, 10
     data_header_len   equ $ - data_header
     ; test data
-    test_data     db 'teststring db "Salve amicus!", 10', 10, "teststring_len equ $ - teststring", 10
-    test_data_len     equ $ - test_data
+    teststring    db 'teststring db "Salve amicus!", 10', 10, "len_teststring equ $ - teststring", 10
+    len_teststring     equ $ - teststring
 
     ; main text
     main_method   db "section .text", 10, 9, "global _start", 10, 10
@@ -118,7 +121,7 @@ _start:
 
     write data_header, data_header_len
     ; test data
-    write test_data, test_data_len
+    write teststring, len_teststring
 
 ; write main header
     write main_method, main_method_len
@@ -132,51 +135,8 @@ lexer_loop:
     cmp r15, r13            ; end of buffer?
     jge end_lexer
 
-    ; Check for "caput"
-    mov rbx, r13
-    sub rbx, r15
-    cmp rbx, 5
-    jl end_lexer
-
-    cmp byte [contents + r15],     'c'
-    jne check_println
-    cmp byte [contents + r15 + 1], 'a'
-    jne check_println
-    cmp byte [contents + r15 + 2], 'p'
-    jne check_println
-    cmp byte [contents + r15 + 3], 'u'
-    jne check_println
-    cmp byte [contents + r15 + 4], 't'
-    jne check_println
-
-    write caput, caput_len
-    write newline, 1
-    add r15, 5              ; skip past the matched token
-    jmp lexer_loop
-
-check_println:
-    mov rbx, r13
-    sub rbx, r15
-    cmp rbx, 6
-    jl end_lexer
-
-    cmp byte [contents + r15],     's'
-    jne next_char
-    cmp byte [contents + r15 + 1], 'c'
-    jne next_char
-    cmp byte [contents + r15 + 2], 'r'
-    jne next_char
-    cmp byte [contents + r15 + 3], 'i'
-    jne next_char
-    cmp byte [contents + r15 + 4], 'b'
-    jne next_char
-    cmp byte [contents + r15 + 5], 'e'
-    jne next_char
-
-    write scribe, scribe_len
-    write newline, 1
-    add r15, 6
-    jmp lexer_loop
+; the cases are stored in there
+%include "lexer.asm"
 
 next_char:
     inc r15
@@ -184,6 +144,8 @@ next_char:
 
 end_lexer:
 
+; parser
+;%include "parser.asm"
 
 ; filler for now
     write newline, 1
