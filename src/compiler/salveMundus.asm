@@ -11,8 +11,8 @@ _start:
 
 mov rax, 1
 mov rdi, 1
-mov rsi, 
-mov rdx, len_
+mov rsi, teststring
+mov rdx, len_teststring
 syscall
 
 

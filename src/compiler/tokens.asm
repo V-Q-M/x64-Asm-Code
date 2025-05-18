@@ -14,6 +14,10 @@
     text_syscall db 10, "syscall"
     text_syscall_len equ $ - text_syscall
 
+    linea_db    db "db "
+    linea_prefix db "len_"
+    linea_len   db "equ $ - "
+
     sisi        db "test", 0   ;si is already used
     si_len      equ $ - sisi
 

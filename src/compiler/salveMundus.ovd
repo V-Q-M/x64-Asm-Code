@@ -1,5 +1,7 @@
+Linea teststring = "Salve Amicus!"
+
 
 caput
 
 
-scribe (teststringtest)
+scribe (teststring)

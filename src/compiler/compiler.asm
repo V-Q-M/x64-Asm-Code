@@ -121,10 +121,14 @@ _start:
 
     write data_header, data_header_len
     ; test data
-    write teststring, len_teststring
+    ;write teststring, len_teststring
+; read variables
+variables:
+    xor r15, r15
+var_loop:
 
-; write main header
-    write main_method, main_method_len
+
+
 
 ; write contents
 ; translate to asm
