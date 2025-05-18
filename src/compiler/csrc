@@ -2,7 +2,7 @@
 
 # Check if a file was provided
 if [ -z "$1" ]; then
-    echo "Usage: ovidc filename.ovd"
+    echo "Usage: csrc filename.csr"
     exit 1
 fi
 
@@ -13,15 +13,15 @@ if [[ "$2" == "--asm" ]]; then
 fi
 # Get the input filename and derive base name
 INPUT="$1"
-BASENAME=$(basename "$INPUT" .ovd)
+BASENAME=$(basename "$INPUT" .csr)
 ASMFILE="${BASENAME}.asm"
 OBJFILE="${BASENAME}.o"
 OUTFILE="${BASENAME}"
 
-# Copy input .ovd into input.ovd (if required by compiler)
-cp "$INPUT" input.ovd
+# Copy input .csr into input.csr (if required by compiler)
+cp "$INPUT" input.csr
 
-# Run custom compiler to convert input.ovd -> output.asm
+# Run custom compiler to convert input.csr -> output.asm
 ./compiler || { echo "Compilation failed."; exit 1; }
 
 # Rename output.asm to the expected ASM file

@@ -30,6 +30,28 @@ match_linea:
 
     write arg_buffer, r14       ;name
     write linea_db, 3           ; db
+
+    add r15, r14
+    ; string value comes here
+    ;write testing, 11
+    push r14
+    add r15, 2
+find_end:
+    inc r14
+    cmp byte [contents + r15 + r14], 34
+    jne find_end
+
+    mov rcx, r14
+    lea rsi, [contents + r15 + 1] ; source = current
+    lea rdi, [str_buffer]     ; destination buffer
+    rep movsb       ; copy n bytes from contents into
+  ;  mov byte [str_buffer + r14], 0   ; null terminate arg_buffer
+
+    write str_buffer, r14
+    write linea_end, 4
+
+    pop r14
+
     write newline, 1
     write linea_prefix, 4           ; len_
     write arg_buffer, r14       ; name

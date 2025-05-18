@@ -2,8 +2,9 @@ section .bss
 
 section .data
 
-teststring db "Salve amicus!", 10
-len_teststring equ $ - teststring
+salve db "Salve Amici!", 10
+len_salve equ $ - salve 
+
 section .text
 	global _start
 
@@ -11,8 +12,8 @@ _start:
 
 mov rax, 1
 mov rdi, 1
-mov rsi, teststring
-mov rdx, len_teststring
+mov rsi, salve
+mov rdx, len_salve
 syscall
 
 

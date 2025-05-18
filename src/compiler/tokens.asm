@@ -17,6 +17,7 @@
     linea_db    db "db "
     linea_prefix db "len_"
     linea_len   db "equ $ - "
+    linea_end   db ", 10"
 
     sisi        db "test", 0   ;si is already used
     si_len      equ $ - sisi

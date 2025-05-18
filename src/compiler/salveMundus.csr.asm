@@ -2,10 +2,10 @@ section .bss
 
 section .data
 
-teststring db 
+teststring db = "Salve Amicus!"
 len_teststring equ $ - teststring 
 
-hello db 
+hello db = "Hello"
 len_hello equ $ - hello 
 
 section .text

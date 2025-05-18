@@ -1,8 +1,0 @@
-Linea teststring = "Salve Amicus!"
-
-Linea hello = "Hello"
-
-caput
-
-
-scribe (teststring)

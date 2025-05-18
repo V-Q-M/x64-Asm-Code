@@ -1,4 +1,4 @@
-;                   OVID-LANG COMPILER
+;                   CAESAR-LANG COMPILER
 ;---------------------------------------------------------
 ;String functions
 extern string_to_int
@@ -37,9 +37,10 @@ extern exponentiation
 
 section .bss
     arg_buffer resb 20
+    str_buffer resb 20
 
 section .data
-    input_file db "input.ovd", 0
+    input_file db "input.csr", 0
     output_file   db "output.asm", 0
     contents_size equ 100
     newline db 10, 0
@@ -62,6 +63,8 @@ section .data
     ; test data
     teststring    db 'teststring db "Salve amicus!", 10', 10, "len_teststring equ $ - teststring", 10
     len_teststring     equ $ - teststring
+    testing       db '"testhello"'
+
 
     ; main text
     main_method   db "section .text", 10, 9, "global _start", 10, 10
